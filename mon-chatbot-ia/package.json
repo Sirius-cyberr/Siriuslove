@@ -1,5 +1,5 @@
 {
-  "name": "sirius-chatbot",
+  "name": "mon-chatbot-ia",
   "version": "1.0.0",
   "description": "Chatbot IA avec Express pour Sirius",
   "main": "server.js",
