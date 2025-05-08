@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu d'évitement</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #222;
+        }
+        #player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            bottom: 50px;
+            left: 50px;
+        }
+        .obstacle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: red;
+            top: 0;
+        }
+    </style>
+</head>
+<body><div id="player"></div><script>
+    const player = document.getElementById('player');
+    let isJumping = false;
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !isJumping) {
+            jump();
+        }
+    });
+
+    function jump() {
+        isJumping = true;
+        let position = 0;
+        const upInterval = setInterval(() => {
+            if (position >= 150) {
+                clearInterval(upInterval);
+                const downInterval = setInterval(() => {
+                    if (position <= 0) {
+                        clearInterval(downInterval);
+                        isJumping = false;
+                    } else {
+                        position -= 5;
+                        player.style.bottom = 50 + position + 'px';
+                    }
+                }, 20);
+            } else {
+                position += 5;
+                player.style.bottom = 50 + position + 'px';
+            }
+        }, 20);
+    }
+
+    function createObstacle() {
+        const obstacle = document.createElement('div');
+        obstacle.classList.add('obstacle');
+        obstacle.style.top = Math.random() * (window.innerHeight - 40) + 'px';
+        obstacle.style.left = window.innerWidth + 'px';
+        document.body.appendChild(obstacle);
+
+        let obstacleInterval = setInterval(() => {
+            let left = parseInt(obstacle.style.left);
+            if (left < -40) {
+                clearInterval(obstacleInterval);
+                obstacle.remove();
+            } else {
+                obstacle.style.left = (left - 5) + 'px';
+
+                // Collision detection
+                let playerRect = player.getBoundingClientRect();
+                let obstacleRect = obstacle.getBoundingClientRect();
+
+                if (
+                    playerRect.left < obstacleRect.left + obstacleRect.width &&
+                    playerRect.left + playerRect.width > obstacleRect.left &&
+                    playerRect.top < obstacleRect.top + obstacleRect.height &&
+                    playerRect.height + playerRect.top > obstacleRect.top
+                ) {
+                    alert('Game Over!');
+                    window.location.reload();
+                }
+            }
+        }, 20);
+
+        setTimeout(createObstacle, Math.random() * 2000 + 1000);
+    }
+
+    createObstacle();
+</script></body>
+</html>
