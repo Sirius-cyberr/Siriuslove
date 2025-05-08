@@ -2,33 +2,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu d'évitement</title>
+    <title>Chien Runner</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background: #222;
+            background: #87CEEB;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
         }
-        #player {
+        #gameArea {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #87CEEB;
+        }
+        #dog {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            background: #4CAF50;
+            width: 50px;
+            height: 50px;
+            background: url('https://cdn-icons-png.flaticon.com/512/616/616408.png') no-repeat center/cover;
             bottom: 50px;
             left: 50px;
         }
         .obstacle {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            background: red;
+            width: 50px;
+            height: 50px;
+            background: url('https://cdn-icons-png.flaticon.com/512/616/616408.png') no-repeat center/cover;
             top: 0;
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #000;
+            font-weight: bold;
         }
     </style>
 </head>
-<body><div id="player"></div><script>
-    const player = document.getElementById('player');
+<body><div id="gameArea">
+    <div id="dog"></div>
+    <div id="score">Score: 0</div>
+</div><script>
+    const dog = document.getElementById('dog');
+    const scoreDisplay = document.getElementById('score');
     let isJumping = false;
+    let score = 0;
 
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space' && !isJumping) {
@@ -40,7 +62,7 @@
         isJumping = true;
         let position = 0;
         const upInterval = setInterval(() => {
-            if (position >= 150) {
+            if (position >= 200) {
                 clearInterval(upInterval);
                 const downInterval = setInterval(() => {
                     if (position <= 0) {
@@ -48,12 +70,12 @@
                         isJumping = false;
                     } else {
                         position -= 5;
-                        player.style.bottom = 50 + position + 'px';
+                        dog.style.bottom = 50 + position + 'px';
                     }
                 }, 20);
             } else {
                 position += 5;
-                player.style.bottom = 50 + position + 'px';
+                dog.style.bottom = 50 + position + 'px';
             }
         }, 20);
     }
@@ -61,35 +83,37 @@
     function createObstacle() {
         const obstacle = document.createElement('div');
         obstacle.classList.add('obstacle');
-        obstacle.style.top = Math.random() * (window.innerHeight - 40) + 'px';
+        obstacle.style.top = Math.random() * (window.innerHeight - 50) + 'px';
         obstacle.style.left = window.innerWidth + 'px';
-        document.body.appendChild(obstacle);
+        document.getElementById('gameArea').appendChild(obstacle);
 
         let obstacleInterval = setInterval(() => {
             let left = parseInt(obstacle.style.left);
-            if (left < -40) {
+            if (left < -50) {
                 clearInterval(obstacleInterval);
                 obstacle.remove();
+                score += 1;
+                scoreDisplay.textContent = 'Score: ' + score;
             } else {
-                obstacle.style.left = (left - 5) + 'px';
+                obstacle.style.left = (left - 7) + 'px';
 
                 // Collision detection
-                let playerRect = player.getBoundingClientRect();
+                let dogRect = dog.getBoundingClientRect();
                 let obstacleRect = obstacle.getBoundingClientRect();
 
                 if (
-                    playerRect.left < obstacleRect.left + obstacleRect.width &&
-                    playerRect.left + playerRect.width > obstacleRect.left &&
-                    playerRect.top < obstacleRect.top + obstacleRect.height &&
-                    playerRect.height + playerRect.top > obstacleRect.top
+                    dogRect.left < obstacleRect.left + obstacleRect.width &&
+                    dogRect.left + dogRect.width > obstacleRect.left &&
+                    dogRect.top < obstacleRect.top + obstacleRect.height &&
+                    dogRect.height + dogRect.top > obstacleRect.top
                 ) {
-                    alert('Game Over!');
+                    alert('Game Over! Score: ' + score);
                     window.location.reload();
                 }
             }
         }, 20);
 
-        setTimeout(createObstacle, Math.random() * 2000 + 1000);
+        setTimeout(createObstacle, Math.random() * 1500 + 700);
     }
 
     createObstacle();
